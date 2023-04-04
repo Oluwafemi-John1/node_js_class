@@ -2,13 +2,31 @@ const express = require('express');
 const app = express();
 const ejs = require('ejs');
 const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
+
+const URI = "mongodb+srv://Oluwafemi:john1998@cluster0.kn0llwr.mongodb.net/schoolportal_db2?retryWrites=true&w=majority"
 
 
+mongoose.connect(URI)
+.then(()=>{
+    console.log("Mongoose neural handshake complete");
+})
+.catch((err)=>{
+    console.log(err);
+})
+
+let userSchema = {
+    firstname:String,
+    lastname:String,
+    email:String,
+    password:String
+}
+
+let userModel = mongoose.model('users_collection',userSchema)
 
 app.set("view engine", "ejs");
 // app.use(express.bodyParser({urlencoded:true}));
 app.use(bodyParser.urlencoded({extended:true}));
-
 
 app.get("/",(req,res)=>{
     console.log("Route slash accessed");
@@ -32,7 +50,7 @@ app.get("/okay",(req,res)=>{
 })
 
 app.get("/signup",(req,res)=>{
-    res.render("signup")
+    res.render("signup",{message:""})
 })
 
 app.get("/signin",(req,res)=>{
@@ -45,6 +63,16 @@ app.get("/dash",(req,res)=>{
 
 app.post("/details",(req,res)=>{
     console.log(req.body);
+    let form = new userModel(req.body)
+    form.save()
+    .then(()=>{
+        console.log("database ti gba wole")
+        res.render("signup",{message:"Sign up successful"})
+    })
+    .catch((err)=>{
+        console.log(err);
+        res.render("signup",{message:"Failed to submit"})
+    })
 })
 
 app.listen("4670",()=>{
