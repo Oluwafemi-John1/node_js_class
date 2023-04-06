@@ -10,8 +10,11 @@
 <body>
     <div class="container-fluid col-7 mx-auto my-2 shadow-sm">
         <h1 class="text-center text-decoration-underline">Sign Up</h1>
-
-        <form action="/details" method="post">
+        <% if (message != "") { %>
+            <div class="text-center alert alert-danger"><%= message %></div>
+        <% } %>
+      
+        <form action="/signup" method="post">
             <div class="form-group my-3">
                 <label for="firstname">First Name</label>
                 <input type="text" class="form-control" id="firstname" placeholder="Enter First Name" name="firstname">
@@ -32,7 +35,7 @@
                 <button class="btn btn-success w-100" type="submit">Submit</button>
             </div>
         </form>
-        <div class="text-center"><%= message %></div>
+        <a href="signin">Go to signin</a>
     </div>
 </body>
 </html>

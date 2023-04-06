@@ -16,10 +16,10 @@ mongoose.connect(URI)
 })
 
 let userSchema = {
-    firstname:String,
-    lastname:String,
-    email:String,
-    password:String
+    firstname:{type:String, required:true},
+    lastname:{type:String, required:true},
+    email:{type:String, required:true, unique:true},
+    password:{type:String, required:true},
 }
 
 let userModel = mongoose.model('users_collection',userSchema)
@@ -54,27 +54,36 @@ app.get("/signup",(req,res)=>{
 })
 
 app.get("/signin",(req,res)=>{
-    res.render("signin")
+    res.render("signin",{message:""})
 })
-
 app.get("/dash",(req,res)=>{
-    res.render("dashboard",{name:"Idogbe",food:"Garri"})
+    res.render("dashboard")
 })
 
-app.post("/details",(req,res)=>{
+app.post("/signup",(req,res)=>{
     console.log(req.body);
     let form = new userModel(req.body)
+    console.log(form);
     form.save()
-    .then(()=>{
-        console.log("database ti gba wole")
-        res.render("signup",{message:"Sign up successful"})
+    .then((response)=>{
+        console.log("successfully saved");
+        // console.log(response)
+        res.redirect("/signin")
     })
     .catch((err)=>{
         console.log(err);
-        res.render("signup",{message:"Failed to submit"})
+        if (err.code === 11000) {
+            console.log(err.code);
+            res.render("signup",{message:"Email already exist"})
+        } else {
+            res.render("signup", {message:"Please fill in all fields"})
+        }
     })
 })
 
+app.post("/signin",(req,res)=>{
+    
+})
 app.listen("4670",()=>{
     console.log("Server has started on port 4670");
 })
