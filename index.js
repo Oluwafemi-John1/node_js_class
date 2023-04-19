@@ -19,7 +19,7 @@ let userSchema = {
     firstname:{type:String, required:true},
     lastname:{type:String, required:true},
     email:{type:String, required:true, unique:true},
-    password:{type:String, required:true},
+    password:{type:String, required:true}
 }
 
 let userModel = mongoose.model('users_collection',userSchema)
@@ -56,8 +56,15 @@ app.get("/signup",(req,res)=>{
 app.get("/signin",(req,res)=>{
     res.render("signin",{message:""})
 })
-app.get("/dash",(req,res)=>{
-    res.render("dashboard")
+app.get("/dashboard",(req,res)=>{
+    userModel.find()
+    .then((response)=>{
+        console.log(response);
+        res.render("dashboard", {userDetails: response})
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
 })
 
 app.post("/signup",(req,res)=>{
@@ -82,8 +89,53 @@ app.post("/signup",(req,res)=>{
 })
 
 app.post("/signin",(req,res)=>{
+    userModel.find({email:req.body.email,password:req.body.password})
+    .then((response)=>{
+        console.log(response);
+        if (response.length > 0) {
+            res.redirect("dashboard")
+        } else {
+            res.render("signin", {message: "Incorrect details entered"})
+        }
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
     
 })
+
+app.post("/delete",(req,res)=>{
+    // let userId = req.body.id
+    userModel.deleteOne({email:req.body.userEmail})
+    .then(()=>{
+        res.redirect("dashboard")
+        console.log("deleted one user");
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+})
+
+app.post("/edit",(req,res)=>{
+    userModel.findOne({email:req.body.userEmail})
+    .then((response)=>{
+        console.log(response);
+        res.render("editUser", {userDetails:response})
+    })
+})
+
+app.post("/update", (req,res)=>{
+    let id = req.body.id
+    userModel.findByIdAndUpdate(id, req.body)
+    .then((response)=>{
+        console.log(response);
+        res.redirect("dashboard")
+    })
+    .catch((err)=>{
+        console.log(err);
+    })
+})
+
 app.listen("4670",()=>{
     console.log("Server has started on port 4670");
 })
